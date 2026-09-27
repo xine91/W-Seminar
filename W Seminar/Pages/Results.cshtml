@@ -1,0 +1,102 @@
+@page
+@using PokerSimPlatform.Core.Models
+@model W_Seminar.Pages.ResultsModel
+@{
+	ViewData["Title"] = "Simulationsergebnisse";
+}
+
+<div class="container-fluid py-4">
+	<h1>Simulationsergebnisse (Rohdaten)</h1>
+	<p class="text-muted">
+		Alle persistierten Simulationsergebnisse aus <code>@Model.FilePath</code>.
+		Insgesamt <strong>@Model.TotalCount</strong> Einträge.
+	</p>
+
+	<div class="mb-3">
+		<a href="?handler=Download" class="btn btn-sm btn-outline-primary">JSON-Datei herunterladen</a>
+		<a asp-page="/Simulation" class="btn btn-sm btn-primary">Neue Simulation starten</a>
+	</div>
+
+	<form method="get" class="row g-2 mb-3">
+		<div class="col-md-2">
+			<select asp-for="FilterPosition" class="form-select" onchange="this.form.submit()">
+				<option value="">Alle Positionen</option>
+				@foreach (var p in Model.AllPositions)
+				{
+					<option value="@p">@p</option>
+				}
+			</select>
+		</div>
+		<div class="col-md-2">
+			<select asp-for="FilterPhase" class="form-select" onchange="this.form.submit()">
+				<option value="Alle">Alle Phasen</option>
+				<option value="Preflop">Preflop</option>
+				<option value="Flop">Flop</option>
+				<option value="Endgame">Endgame</option>
+			</select>
+		</div>
+		<div class="col-md-2">
+			<select asp-for="FilterSession" class="form-select" onchange="this.form.submit()">
+				<option value="">Alle Sessions</option>
+				@foreach (var s in Model.AllSessions)
+				{
+					<option value="@s">@s</option>
+				}
+			</select>
+		</div>
+		<div class="col-md-2">
+			<input asp-for="MaxRows" type="number" min="10" max="10000" step="10" class="form-control" />
+		</div>
+		<div class="col-md-2">
+			<button type="submit" class="btn btn-outline-secondary">Anwenden</button>
+		</div>
+	</form>
+
+	<div class="table-responsive">
+		<table class="table table-sm table-striped">
+			<thead>
+				<tr>
+					<th>Timestamp</th>
+					<th>Session</th>
+					<th>Position</th>
+					<th>Hand</th>
+					<th>Decision</th>
+					<th>Equity</th>
+					<th>Phase</th>
+					<th>Tisch</th>
+					<th>Gegner</th>
+					<th>MC-It</th>
+				</tr>
+			</thead>
+			<tbody>
+				@foreach (var r in Model.Results)
+				{
+					<tr>
+						<td>@r.Timestamp.ToString("yyyy-MM-dd HH:mm:ss")</td>
+						<td><code>@r.SessionId</code></td>
+						<td>@r.Position</td>
+						<td><strong>@r.StartingHand</strong></td>
+						<td>
+							<span class="badge @(r.Decision == PlayerDecision.Raise ? "bg-success" : r.Decision == PlayerDecision.Call ? "bg-warning text-dark" : "bg-secondary")">
+								@r.Decision
+							</span>
+						</td>
+						<td>@r.Equity.ToString("P1")</td>
+						<td>@r.Phase</td>
+						<td>@r.TableSize-max</td>
+						<td>@r.NumOpponents</td>
+						<td>@r.NumSimulations</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	</div>
+	@if (Model.Results.Count == 0)
+	{
+		<div class="alert alert-info">Keine Ergebnisse für die gewählten Filter.</div>
+	}
+	else
+	{
+		<small class="text-muted">Zeige @Model.Results.Count von @Model.TotalCount (max @Model.MaxRows).</small>
+	}
+</div>

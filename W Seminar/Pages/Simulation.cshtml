@@ -1,0 +1,163 @@
+@page
+@using PokerSimPlatform.Core.Models
+@model W_Seminar.Pages.SimulationModel
+@{
+	ViewData["Title"] = "Simulation starten";
+}
+
+<div class="container py-4">
+	<h1>Simulation konfigurieren</h1>
+	<p class="text-muted">
+		Batch-Lauf über alle 169 Starthände × aktive Positionen.
+		Equity wird per Monte-Carlo gegen die konfigurierte Gegnerrange berechnet.
+	</p>
+
+	<div class="row">
+		<div class="col-md-6">
+			<form method="post" class="card card-body">
+				@Html.AntiForgeryToken()
+				<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+				<div class="mb-3">
+					<label class="form-label">Tischgröße</label>
+					<select asp-for="Input.TableSize" class="form-select">
+						<option value="6">6-max</option>
+						<option value="9">9-max</option>
+					</select>
+				</div>
+
+				<div class="mb-3">
+					<label class="form-label">Phase</label>
+					<select asp-for="Input.Phase" class="form-select">
+						<option value="Preflop">Preflop</option>
+						<option value="Flop">Flop (3 Board-Karten)</option>
+						<option value="Endgame">Endgame (5 Board-Karten)</option>
+					</select>
+				</div>
+
+				<div class="mb-3">
+					<label class="form-label">Gegnerrange (Komma-getrennt, Poker-Notation)</label>
+					<textarea asp-for="Input.OpponentRange" class="form-control" rows="4"
+						placeholder="AA,KK,QQ,AKs,AQs,AKo,AQo"></textarea>
+					<div class="form-text">
+						Beispiele: <code>AA,KK,QQ,JJ,TT,AKs,AQs,AJs,AKo,AQo</code> (Top 10)
+						oder leer lassen für Standard-Range (Top 20%).
+					</div>
+				</div>
+
+				<div class="mb-3">
+					<label class="form-label">Anzahl Monte-Carlo-Iterationen pro Hand</label>
+					<input asp-for="Input.MonteCarloIterations" type="number" min="50" max="20000" step="50" class="form-control" />
+				</div>
+
+				<div class="mb-3">
+					<label class="form-label">Anzahl Gegner</label>
+					<input asp-for="Input.NumOpponents" type="number" min="1" max="8" class="form-control" />
+				</div>
+
+				<div class="mb-3">
+					<label class="form-label">Starthand-Filter (optional, leer = alle 169)</label>
+					<input asp-for="Input.HandFilter" class="form-control" placeholder="z. B. AA,KK,QQ,AKs" />
+				</div>
+
+				<hr class="my-4" />
+				<h6>Expected Value Parameter</h6>
+
+				<div class="row">
+					<div class="col-md-6">
+						<div class="mb-3">
+							<label class="form-label">Small Blind</label>
+							<input asp-for="Input.SmallBlind" type="number" step="0.1" min="0" class="form-control" />
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="mb-3">
+							<label class="form-label">Big Blind</label>
+							<input asp-for="Input.BigBlind" type="number" step="0.1" min="0" class="form-control" />
+						</div>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col-md-6">
+						<div class="mb-3">
+							<label class="form-label">Pot (aktuell)</label>
+							<input asp-for="Input.Pot" type="number" step="0.1" min="0" class="form-control" />
+							<div class="form-text">Größe des Pots bevor Sie callen müssen</div>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="mb-3">
+							<label class="form-label">Call-Kosten</label>
+							<input asp-for="Input.CallCost" type="number" step="0.1" min="0" class="form-control" />
+							<div class="form-text">Wie viel müssen Sie callen?</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="mb-3" id="boardInputContainer" style="display: none;">
+					<label class="form-label">Board (5 Karten, Endgame)</label>
+					<input asp-for="Input.Board" class="form-control" placeholder="z. B. AsKhQd2c3h" />
+					<div class="form-text">
+						Board-Karten in Poker-Notation (z.B. AsKhQd2c3h = Pik-As, Herz-König, Karo-Dame, Kreuz-Zwei, Herz-Drei)
+					</div>
+				</div>
+
+				<button type="submit" class="btn btn-primary">Simulation starten</button>
+			</form>
+		</div>
+
+		<div class="col-md-6">
+			@if (Model.Result != null)
+			{
+				<div class="alert alert-success">
+					<h5 class="alert-heading">Simulation abgeschlossen</h5>
+					<ul class="mb-0">
+						<li>Session-ID: <code>@Model.Result.SessionId</code></li>
+						<li>Samples geschrieben: <strong>@Model.Result.SamplesWritten</strong></li>
+						<li>Dauer: @Model.Result.DurationSeconds.ToString("F2") s</li>
+						<li>JSON-Datei: <code>@Model.Result.FilePath</code></li>
+					</ul>
+					<hr />
+					<a asp-page="/Matrix" class="btn btn-sm btn-outline-primary">Matrix ansehen</a>
+					<a asp-page="/Results" class="btn btn-sm btn-outline-secondary">Rohdaten</a>
+				</div>
+			}
+			else if (Model.IsRunning)
+			{
+				<div class="alert alert-info">
+					Simulation läuft… (dies kann je nach Iterationszahl einige Sekunden dauern)
+				</div>
+			}
+
+			@* <div class="card mt-3">
+				<div class="card-body">
+					<h6>Hinweise zur Performance</h6>
+					<ul class="small mb-0">
+											
+										</ul>
+									</div>
+								</div>
+							</div>
+						</div>
+						</div> *@
+
+						<script>
+							// Board-Input nur bei Endgame sichtbar machen
+							const phaseSelect = document.querySelector('[asp-for="Input.Phase"]');
+							const boardContainer = document.getElementById('boardInputContainer');
+
+							function updateBoardVisibility() {
+								if (phaseSelect && boardContainer) {
+									boardContainer.style.display = phaseSelect.value === 'Endgame' ? 'block' : 'none';
+								}
+							}
+
+							// Initial call
+							updateBoardVisibility();
+
+							// Listener
+							if (phaseSelect) {
+								phaseSelect.addEventListener('change', updateBoardVisibility);
+							}
+						</script>

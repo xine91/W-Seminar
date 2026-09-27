@@ -1,0 +1,94 @@
+@page "/ewmatrix"
+@using PokerSimPlatform.Core.Models
+@model W_Seminar.Pages.EWMatrixModel
+@{
+	ViewData["Title"] = "EW-Matrix";
+}
+
+<div class="container-fluid py-4">
+	<h1>Expected Value (EW) Matrix</h1>
+	<p class="text-muted">
+		Berechnung: EW = (Pot × Equity) - (CallCost × (1 - Equity))
+	</p>
+
+	<form method="get" class="row g-2 align-items-end mb-3">
+		<div class="col-auto">
+			<label class="form-label">Position</label>
+			<select asp-for="SelectedPosition" class="form-select" onchange="this.form.submit()">
+				<option value="">Alle Positionen</option>
+				@foreach (var p in Model.AllPositions)
+				{
+					<option value="@p">@p</option>
+				}
+			</select>
+		</div>
+		<div class="col-auto">
+			<label class="form-label">Phase</label>
+			<select asp-for="SelectedPhase" class="form-select" onchange="this.form.submit()">
+				<option value="Alle">Alle</option>
+				<option value="Preflop">Preflop</option>
+				<option value="Flop">Flop</option>
+				<option value="Endgame">Endgame</option>
+			</select>
+		</div>
+		<div class="col-auto">
+			<span class="badge bg-secondary">@Model.TotalSamples Samples</span>
+		</div>
+	</form>
+
+	@if (Model.Cells == null)
+	{
+		<div class="alert alert-warning">
+			Keine Simulationsergebnisse vorhanden. Starte eine Simulation auf der
+			<a asp-page="/Simulation">Simulations-Seite</a>.
+		</div>
+	}
+	else
+	{
+		<div class="matrix-wrapper">
+			<table class="poker-matrix">
+				<thead>
+					<tr>
+						<th class="corner"></th>
+						@foreach (var col in Model.Ranks)
+						{
+							<th class="rank-header">@col</th>
+						}
+					</tr>
+				</thead>
+				<tbody>
+					@for (int r = 0; r < 13; r++)
+					{
+						<tr>
+							<th class="rank-header">@Model.Ranks[r]</th>
+							@for (int c = 0; c < 13; c++)
+							{
+								var cell = Model.Cells[r, c];
+								var intensity = Model.GetIntensity(cell);
+								var cellClass = "matrix-cell";
+								if (cell.TotalSamples == 0) cellClass += " empty";
+								else cellClass += intensity > 0 ? (intensity > 0.2 ? " heat-high" : " heat-mid") : " heat-low";
+
+								<td class="@cellClass" style="background-color: rgba(@Model.GetColorRgb(cell))"
+									title="@cell.Hand | N=@cell.TotalSamples | Eq=@cell.AvgEquity.ToString("P1") | EW=@cell.AvgExpectedValue.ToString("F2")">
+									<div class="cell-hand">@cell.Hand</div>
+									<div class="cell-value">@Model.FormatCellValue(cell)</div>
+								</td>
+							}
+						</tr>
+					}
+				</tbody>
+			</table>
+		</div>
+
+		<div class="mt-3">
+			<small class="text-muted">
+				Farbintensität:
+				<span class="legend-swatch heat-low"></span> negativ/unfavorabel
+				<span class="legend-swatch heat-mid"></span> neutral
+				<span class="legend-swatch heat-high"></span> positiv/profitabel
+				&nbsp;|&nbsp; Klick/Tooltip auf Zelle für Detailstatistik.
+			</small>
+		</div>
+	}
+</div>

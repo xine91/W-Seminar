@@ -1,0 +1,64 @@
+@page
+@model IndexModel
+@{
+	ViewData["Title"] = "PokerSim – Übersicht";
+}
+
+<div class="container py-4">
+	<h1 class="mb-3">PokerSim – Quantitative Poker-Simulation</h1>
+	<p class="lead">
+		Webplattform zur Monte-Carlo-Equity-Berechnung in der Preflop	
+		von Texas Hold'em sowie statistischer Auswertung der Simulationsergebnisse.
+	</p>
+
+	<div class="row g-3 mt-4">
+		<div class="col-md-6">
+			<div class="card h-100">
+				<div class="card-header bg-primary text-white">
+					<h5 class="mb-0">Simulation & Auswertung</h5>
+				</div>
+				<div class="card-body">
+					<ul class="list-unstyled">
+						<li class="mb-2">
+							<strong>Simulation</strong>
+							
+							<a asp-page="/Simulation" class="btn btn-sm btn-outline-primary">Starten</a>
+						</li>
+						<li class="mb-2">
+							<strong>Equity-Matrix</strong>
+							
+							<a asp-page="/Matrix" class="btn btn-sm btn-outline-primary">Anzeigen</a>
+						</li>
+						<li>
+							<strong>EW-Matrix (Expected Value)</strong>
+							
+							<a asp-page="/EWMatrix" class="btn btn-sm btn-outline-primary">Anzeigen</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-6">
+			<div class="card h-100">
+				<div class="card-header bg-success text-white">
+					<h5 class="mb-0">Daten & Details</h5>
+				</div>
+				<div class="card-body">
+					<div class="mb-3">
+						<strong>Rohdaten ansehen</strong>
+						<p class="text-muted small mb-2">Alle Simulationsergebnisse in tabellarischer Form</p>
+						
+						<a asp-page="/Results" class="btn btn-sm btn-outline-success mt-2">Zu den Ergebnissen</a>
+					</div>
+					
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="alert alert-info mt-4">
+		<strong>Hinweis:</strong> Beim ersten Start wurde automatisch ein Seed-Datensatz generiert,
+		damit die Matrix sofort eine Heatmap anzeigt. Reale Simulationen können über die
+		<a asp-page="/Simulation" class="alert-link">Simulations-Seite</a> gestartet werden.
+	</div>
+</div>

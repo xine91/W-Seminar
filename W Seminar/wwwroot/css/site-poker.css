@@ -1,0 +1,92 @@
+/* PokerSim-spezifische Styles: 13×13-Heatmap-Matrix */
+
+.matrix-wrapper {
+    overflow-x: auto;
+    margin: 1rem 0;
+}
+
+.poker-matrix {
+    border-collapse: collapse;
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 11px;
+    table-layout: fixed;
+}
+
+.poker-matrix th,
+.poker-matrix td {
+    border: 1px solid #dee2e6;
+    width: 64px;
+    height: 56px;
+    text-align: center;
+    vertical-align: middle;
+    padding: 0;
+    user-select: none;
+}
+
+.poker-matrix th.rank-header {
+    background: #f8f9fa;
+    color: #495057;
+    font-weight: 700;
+    width: 36px;
+}
+
+.poker-matrix th.corner {
+    background: #f8f9fa;
+    width: 36px;
+}
+
+.matrix-cell {
+    cursor: help;
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+    color: #fff;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.4);
+}
+
+.matrix-cell.empty {
+    background-color: #f1f3f5 !important;
+    color: #adb5bd;
+    text-shadow: none;
+    cursor: default;
+}
+
+.matrix-cell:not(.empty):hover {
+    transform: scale(1.06);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    z-index: 2;
+    position: relative;
+}
+
+.matrix-cell .cell-hand {
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+}
+
+.matrix-cell .cell-value {
+    font-size: 10px;
+    opacity: 0.95;
+    margin-top: 2px;
+}
+
+.heat-high { /* kräftiges Grün */ }
+.heat-mid  { /* Bernstein/Gelb */ }
+.heat-low  { /* Rot */ }
+
+.legend-swatch {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    vertical-align: middle;
+    border: 1px solid #dee2e6;
+    margin: 0 4px 0 8px;
+}
+.legend-swatch.heat-low  { background-color: #dc3545; }
+.legend-swatch.heat-mid  { background-color: #ffc107; }
+.legend-swatch.heat-high { background-color: #28a745; }
+
+/* Tabellen-Styles für Results-Seite */
+table.table code { font-size: 11px; }
+
+/* Karten-Badges */
+.badge.bg-success { background-color: #28a745 !important; }
+.badge.bg-warning { background-color: #ffc107 !important; }
